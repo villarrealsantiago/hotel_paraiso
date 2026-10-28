@@ -1,0 +1,57 @@
+
+#habitaciones .card {
+    height: 100%;
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#habitaciones .card-img-top {
+    display: block;
+    width: 100%;
+    height: 230px;
+    object-fit: cover;
+}
+
+#habitaciones .card-body {
+    display: flex;
+    flex-direction: column;
+    padding: 25px;
+}
+
+#habitaciones .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+#habitaciones .btn {
+    background-color: #344c5c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    align-self: flex-start;
+    margin-top: auto;
+    transition: background-color 0.3s ease;
+}
+
+#habitaciones .btn:hover {
+    background-color: #243743;
+}
+
+/* Separación entre tarjetas */
+#habitaciones .row {
+    row-gap: 24px;
+}
+
+/* Adaptación para celulares */
+@media (max-width: 576px) {
+    #habitaciones .card-img-top {
+        height: 210px;
+    }
+
+    #habitaciones .card-body {
+        padding: 20px;
+    }
+}
