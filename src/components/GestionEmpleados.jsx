@@ -148,10 +148,10 @@ function GestionEmpleados() {
     {
       name: "Acciones",
       cell: (fila) => (
-        <div className="d-flex gap-2">
+        <div className="hp-employee-actions">
           <button
             type="button"
-            className="btn btn-sm btn-outline-primary"
+            className="btn btn-sm btn-outline-primary hp-employee-action"
             title="Editar empleado"
             aria-label={`Editar a ${fila.nombre}`}
             onClick={() => editarEmpleado(fila)}
@@ -160,7 +160,7 @@ function GestionEmpleados() {
           </button>
           <button
             type="button"
-            className={`btn btn-sm ${fila.estado === "Activo" ? "btn-outline-danger" : "btn-outline-success"}`}
+            className={`btn btn-sm hp-employee-action ${fila.estado === "Activo" ? "btn-outline-danger" : "btn-outline-success"}`}
             title={fila.estado === "Activo" ? "Inhabilitar empleado" : "Activar empleado"}
             aria-label={`${fila.estado === "Activo" ? "Inhabilitar" : "Activar"} a ${fila.nombre}`}
             onClick={() => cambiarEstado(fila)}
@@ -183,8 +183,7 @@ function GestionEmpleados() {
         <h2 className="mb-0">Gestión de empleados</h2>
         <button
           type="button"
-          className="btn text-white"
-          style={{ backgroundColor: "#344c5c" }}
+          className="btn hp-employee-primary"
           onClick={iniciarRegistro}
           disabled={Boolean(errorCarga)}
         >

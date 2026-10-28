@@ -1,5 +1,13 @@
 export const CLAVE_EMPLEADOS = "empleadosHotel"
 
+export const CARGOS_EMPLEADOS = [
+  "Recepción",
+  "Limpieza",
+  "Mantenimiento",
+  "Cocina",
+  "Administración",
+]
+
 export function normalizarDocumento(documento) {
   return documento.trim().toUpperCase()
 }

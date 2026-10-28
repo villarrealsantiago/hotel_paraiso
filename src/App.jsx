@@ -3,8 +3,43 @@ import { Routes, Route, useNavigate } from "react-router-dom"
 import Home from "./pages/Home"
 import Dashboard from "./pages/admin/Dashboard"
 import ClienteDashboard from "./pages/cliente/ClienteDashboard"
+import EmpleadoDashboard from "./pages/empleado/EmpleadoDashboard"
 import ProtectedRoute from "./components/ProtectedRoute"
 import { CLIENTE_DEMO } from "./utils/clientes"
+import { obtenerEmpleados } from "./utils/empleados"
+
+function cargarEmpleadoActivo() {
+  const sesion = localStorage.getItem("empleadoActivoHotel")
+  if (!sesion) {
+    return null
+  }
+
+  try {
+    const empleado = JSON.parse(sesion)
+    if (
+      empleado &&
+      typeof empleado.id === "string" &&
+      typeof empleado.correo === "string"
+    ) {
+      const registroActivo = obtenerEmpleados().find(
+        (registro) =>
+          registro.id === empleado.id && registro.estado === "Activo"
+      )
+      if (registroActivo) {
+        return {
+          id: registroActivo.id,
+          nombre: registroActivo.nombre,
+          correo: registroActivo.correo,
+          cargo: registroActivo.cargo,
+        }
+      }
+    }
+  } catch {
+    return null
+  }
+
+  return null
+}
 
 function cargarClienteActivo() {
   const sesion = localStorage.getItem("clienteActivoHotel")
@@ -30,6 +65,7 @@ function App() {
     return localStorage.getItem("usuarioHotel")
   })
   const [clienteActivo, setClienteActivo] = useState(cargarClienteActivo)
+  const [empleadoActivo, setEmpleadoActivo] = useState(cargarEmpleadoActivo)
 
   const navigate = useNavigate()
   
@@ -50,13 +86,30 @@ function App() {
       setClienteActivo(null)
       localStorage.removeItem("clienteActivoHotel")
     }
-    navigate(rol === "admin" ? "/admin" : "/cliente")
+    if (rol === "empleado" && cliente) {
+      const sesionEmpleado = {
+        id: cliente.id,
+        nombre: cliente.nombre,
+        correo: cliente.correo,
+        cargo: cliente.cargo,
+      }
+      setEmpleadoActivo(sesionEmpleado)
+      localStorage.setItem("empleadoActivoHotel", JSON.stringify(sesionEmpleado))
+    } else {
+      setEmpleadoActivo(null)
+      localStorage.removeItem("empleadoActivoHotel")
+    }
+    navigate(
+      rol === "admin" ? "/admin" : rol === "empleado" ? "/empleado" : "/cliente"
+    )
   }
   const cerrarSesion = () => {
     setUsuario(null)
     setClienteActivo(null)
+    setEmpleadoActivo(null)
     localStorage.removeItem("usuarioHotel")
     localStorage.removeItem("clienteActivoHotel")
+    localStorage.removeItem("empleadoActivoHotel")
     navigate("/")
   }
   const actualizarPerfilCliente = (perfil) => {
@@ -96,6 +149,21 @@ function App() {
           </ProtectedRoute>
         }
         />
+      <Route
+        path="/empleado"
+        element={
+          <ProtectedRoute
+            usuario={usuario}
+            rolPermitido="empleado"
+            sesionValida={Boolean(empleadoActivo)}
+          >
+            <EmpleadoDashboard
+              empleado={empleadoActivo}
+              onLogout={cerrarSesion}
+            />
+          </ProtectedRoute>
+        }
+      />
          
     
     </Routes>

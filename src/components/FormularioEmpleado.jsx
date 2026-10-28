@@ -1,5 +1,6 @@
 import { useState } from "react"
 import {
+  CARGOS_EMPLEADOS,
   normalizarCorreoEmpleado,
   normalizarDocumento,
 } from "../utils/empleados"
@@ -11,6 +12,7 @@ function FormularioEmpleado({ empleado, empleados, guardar, cancelar }) {
     correo: empleado?.correo ?? "",
     telefono: empleado?.telefono ?? "",
     cargo: empleado?.cargo ?? "",
+    password: "",
   })
   const [error, setError] = useState("")
 
@@ -30,6 +32,7 @@ function FormularioEmpleado({ empleado, empleados, guardar, cancelar }) {
       telefono: formulario.telefono.trim(),
       cargo: formulario.cargo.trim(),
     }
+    const password = formulario.password.trim()
 
     if (!/^[A-Z0-9.-]{5,20}$/.test(datos.documento)) {
       setError("El documento debe tener entre 5 y 20 caracteres válidos.")
@@ -51,8 +54,13 @@ function FormularioEmpleado({ empleado, empleados, guardar, cancelar }) {
       return
     }
 
-    if (datos.cargo.length < 2) {
-      setError("El cargo debe tener al menos 2 caracteres.")
+    if (!CARGOS_EMPLEADOS.includes(datos.cargo)) {
+      setError("Selecciona un cargo válido.")
+      return
+    }
+
+    if ((!empleado || password) && password.length < 6) {
+      setError("La contraseña debe tener al menos 6 caracteres.")
       return
     }
 
@@ -69,6 +77,9 @@ function FormularioEmpleado({ empleado, empleados, guardar, cancelar }) {
     }
 
     setError("")
+    if (password) {
+      datos.password = password
+    }
     if (!guardar(datos)) {
       setError("No se pudo guardar el empleado. Inténtalo nuevamente.")
     }
@@ -151,23 +162,49 @@ function FormularioEmpleado({ empleado, empleados, guardar, cancelar }) {
           <label className="form-label" htmlFor="empleado-cargo">
             Cargo
           </label>
-          <input
+          <select
             id="empleado-cargo"
-            className="form-control"
+            className="form-select"
             name="cargo"
             value={formulario.cargo}
             onChange={manejarCambio}
-            minLength={2}
-            maxLength={60}
             required
+          >
+            <option value="">Selecciona un cargo</option>
+            {CARGOS_EMPLEADOS.map((cargo) => (
+              <option key={cargo} value={cargo}>
+                {cargo}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="col-12 mb-3">
+          <label className="form-label" htmlFor="empleado-password">
+            {empleado ? "Nueva contraseña (opcional)" : "Contraseña inicial"}
+          </label>
+          <input
+            id="empleado-password"
+            type="password"
+            className="form-control"
+            name="password"
+            value={formulario.password}
+            onChange={manejarCambio}
+            minLength={formulario.password ? 6 : undefined}
+            autoComplete="new-password"
+            required={!empleado}
           />
+          <small className="text-muted">
+            {empleado
+              ? "Déjala vacía para conservar la contraseña actual."
+              : "Utiliza al menos 6 caracteres."}
+          </small>
         </div>
       </div>
       <div className="d-flex justify-content-end gap-2">
         <button type="button" className="btn btn-outline-secondary" onClick={cancelar}>
           Cancelar
         </button>
-        <button type="submit" className="btn btn-success">
+        <button type="submit" className="btn hp-employee-primary">
           <i className="bi bi-check-circle me-2" aria-hidden="true"></i>
           {empleado ? "Actualizar empleado" : "Registrar empleado"}
         </button>

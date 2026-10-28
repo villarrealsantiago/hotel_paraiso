@@ -13,6 +13,8 @@ function Sidebar({
     Empleados: "bi-people",
     "Mis reservas": "bi-calendar2-date",
     "Mi perfil": "bi-person-badge",
+    Asignaciones: "bi-clipboard-check",
+    "Mis tareas": "bi-list-task",
   };
   return (
     <aside className="hp-sidebar">

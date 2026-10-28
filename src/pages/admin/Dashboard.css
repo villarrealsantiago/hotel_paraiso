@@ -60,6 +60,15 @@
 .hp-status.confirmed { background: #e5f3e9; color: #2d7b47; }
 .hp-status.pending { background: #fff1d7; color: #a47623; }
 .hp-status.cancelada { background: #f8e4e4; color: #a83232; }
+.hp-employee-primary { background: #344c5c; border-color: #344c5c; color: #fff; }
+.hp-employee-primary:hover, .hp-employee-primary:focus { background: #283b48; border-color: #283b48; color: #fff; }
+.hp-employee-primary:disabled { background: #71818b; border-color: #71818b; color: #fff; }
+.hp-employee-actions { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.hp-employee-action { width: 40px; height: 36px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+.hp-task-status { display: inline-block; border-radius: 30px; padding: 6px 10px; font-size: 12px; font-weight: 600; white-space: nowrap; background: #fff1d7; color: #a47623; }
+.hp-task-status.en-curso { background: #e4eff8; color: #315d7b; }
+.hp-task-status.completada { background: #e5f3e9; color: #2d7b47; }
+.hp-task-status.cancelada { background: #f8e4e4; color: #a83232; }
 .hp-placeholder { text-align: center; padding: 70px 20px; }
 .hp-placeholder-icon { color: #c49a59; font-size: 48px; }
 .hp-placeholder p { color: #888; }
@@ -82,5 +91,7 @@
   .hp-stats { gap: 10px; }
   .hp-stat { padding: 14px; }
   .hp-panel { padding: 14px; }
+  .hp-panel > .d-flex.justify-content-between { align-items: flex-start !important; flex-direction: column; }
+  .hp-employee-actions { justify-content: flex-start; }
 }
  

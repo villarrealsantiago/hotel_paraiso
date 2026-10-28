@@ -6,12 +6,17 @@ import {
   normalizarCorreo,
   obtenerClientes,
 } from "../utils/clientes";
+import {
+  normalizarCorreoEmpleado,
+  obtenerEmpleados,
+} from "../utils/empleados";
 
 function LoginModal({ mostrar, cerrar, onLogin }) {
   const [modo, setModo] = useState("login");
   const [nombre, setNombre] = useState("");
   const [correo, setCorreo] = useState("");
   const [password, setPassword] = useState("");
+  const [tipoAcceso, setTipoAcceso] = useState("cliente");
 
   if (!mostrar) return null;
 
@@ -22,22 +27,15 @@ function LoginModal({ mostrar, cerrar, onLogin }) {
     let cliente = null;
     let rol = null;
 
-    if (correoNormalizado === "admin@hotel.com" && password === "123") {
-      rol = "admin";
-    } else if (
-      correoNormalizado === normalizarCorreo(CLIENTE_DEMO.correo) &&
-      password === "123"
-    ) {
-      rol = "cliente";
-      cliente = CLIENTE_DEMO;
-    } else {
+    if (tipoAcceso === "empleado") {
       try {
-        const cuenta = obtenerClientes().find(
+        const empleado = obtenerEmpleados().find(
           (cuenta) =>
-            normalizarCorreo(cuenta.correo) === correoNormalizado &&
+            normalizarCorreoEmpleado(cuenta.correo) === correoNormalizado &&
             cuenta.password === password
         );
-        if (cuenta?.estado === "inactivo") {
+
+        if (empleado?.estado === "Inactivo") {
           Swal.fire({
             icon: "warning",
             title: "Cuenta inactiva",
@@ -46,18 +44,57 @@ function LoginModal({ mostrar, cerrar, onLogin }) {
           });
           return;
         }
-        cliente = cuenta;
-        if (cuenta) {
-          rol = "cliente";
+        if (empleado) {
+          cliente = empleado;
+          rol = "empleado";
         }
       } catch {
         Swal.fire({
           icon: "error",
-          title: "No se pudieron leer las cuentas",
+          title: "No se pudieron leer los empleados",
           text: "Revisa los datos guardados en este navegador e inténtalo nuevamente.",
           confirmButtonColor: "#344c5c",
         });
         return;
+      }
+    } else {
+      if (correoNormalizado === "admin@hotel.com" && password === "123") {
+        rol = "admin";
+      } else if (
+        correoNormalizado === normalizarCorreo(CLIENTE_DEMO.correo) &&
+        password === "123"
+      ) {
+        rol = "cliente";
+        cliente = CLIENTE_DEMO;
+      } else {
+        try {
+          const cuenta = obtenerClientes().find(
+            (cuenta) =>
+              normalizarCorreo(cuenta.correo) === correoNormalizado &&
+              cuenta.password === password
+          );
+          if (cuenta?.estado === "inactivo") {
+            Swal.fire({
+              icon: "warning",
+              title: "Cuenta inactiva",
+              text: "Contacta con la administración del hotel para recuperar el acceso.",
+              confirmButtonColor: "#344c5c",
+            });
+            return;
+          }
+          cliente = cuenta;
+          if (cuenta) {
+            rol = "cliente";
+          }
+        } catch {
+          Swal.fire({
+            icon: "error",
+            title: "No se pudieron leer las cuentas",
+            text: "Revisa los datos guardados en este navegador e inténtalo nuevamente.",
+            confirmButtonColor: "#344c5c",
+          });
+          return;
+        }
       }
     }
 
@@ -151,6 +188,7 @@ function LoginModal({ mostrar, cerrar, onLogin }) {
 
   const cambiarModo = () => {
     setModo((actual) => (actual === "login" ? "registro" : "login"));
+    setTipoAcceso("cliente");
     setNombre("");
     setCorreo("");
     setPassword("");
@@ -158,6 +196,7 @@ function LoginModal({ mostrar, cerrar, onLogin }) {
 
   const cerrarModal = () => {
     setModo("login");
+    setTipoAcceso("cliente");
     setNombre("");
     setCorreo("");
     setPassword("");
@@ -185,10 +224,33 @@ function LoginModal({ mostrar, cerrar, onLogin }) {
 
           <div className="modal-body px-4 pb-4">
             <p className="text-muted">
-              {modo === "login"
+              {modo === "login" && tipoAcceso === "empleado"
+                ? "Ingresa con las credenciales de tu cuenta de empleado"
+                : modo === "login"
                 ? "Ingresa a tu cuenta del hotel"
                 : "Regístrate para reservar y consultar tus estancias"}
             </p>
+
+            {modo === "login" && (
+              <div className="d-flex gap-2 mb-3" role="group" aria-label="Tipo de acceso">
+                <button
+                  type="button"
+                  className={`btn btn-sm ${tipoAcceso === "cliente" ? "btn-dark" : "btn-outline-dark"}`}
+                  aria-pressed={tipoAcceso === "cliente"}
+                  onClick={() => setTipoAcceso("cliente")}
+                >
+                  Cliente / Administrador
+                </button>
+                <button
+                  type="button"
+                  className={`btn btn-sm ${tipoAcceso === "empleado" ? "btn-dark" : "btn-outline-dark"}`}
+                  aria-pressed={tipoAcceso === "empleado"}
+                  onClick={() => setTipoAcceso("empleado")}
+                >
+                  Empleado
+                </button>
+              </div>
+            )}
 
             <form onSubmit={modo === "login" ? iniciarSesion : registrarCliente}>
               {modo === "registro" && (
@@ -253,16 +315,18 @@ function LoginModal({ mostrar, cerrar, onLogin }) {
               </button>
             </form>
 
-            <p className="text-center mt-3 mb-0">
-              {modo === "login" ? "¿No tienes cuenta? " : "¿Ya tienes cuenta? "}
-              <button
-                type="button"
-                className="btn btn-link p-0 align-baseline"
-                onClick={cambiarModo}
-              >
-                {modo === "login" ? "Regístrate" : "Inicia sesión"}
-              </button>
-            </p>
+            {tipoAcceso === "cliente" && (
+              <p className="text-center mt-3 mb-0">
+                {modo === "login" ? "¿No tienes cuenta? " : "¿Ya tienes cuenta? "}
+                <button
+                  type="button"
+                  className="btn btn-link p-0 align-baseline"
+                  onClick={cambiarModo}
+                >
+                  {modo === "login" ? "Regístrate" : "Inicia sesión"}
+                </button>
+              </p>
+            )}
           </div>
         </div>
       </div>
